@@ -27,7 +27,7 @@ const PageSetUp = () => {
 						<Route
 							path="/"
 							element={
-								<Navigate to="/login" />
+								<Navigate to="/home" />
 							}
 						/>
 						<Route
