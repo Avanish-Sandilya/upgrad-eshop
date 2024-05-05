@@ -3,48 +3,47 @@
 import Button from "@mui/material/Button";
 import {useNavigate} from "react-router-dom";
 import useAuthentication from "../../hooks/useAuthentication";
-import {useContext} from "react";
 import {clearAllMetadata} from "../../store/actions/metadataAction";
 import {connect} from "react-redux";
 
-const Logout = ({sx, resetMetadata}) => {
+const Logout = ({ sx, resetMetadata }) => {
+    const { logout } = useAuthentication();
+    const navigate = useNavigate();
 
-	const {AuthCtx} = useAuthentication();
-	const {logout} = useContext(AuthCtx);
+    // Set default value for sx
+    if (!sx) {
+        sx = {};
+    }
 
-	if(sx === null || sx === undefined) {
-		sx = {};
-	}
-	const navigate = useNavigate();
+    // Function to handle logout
+    const performLogout = () => {
+        resetMetadata(); // Reset metadata (if needed)
+        logout()
+            .then(() => {
+                navigate("/login"); // Redirect to login page
+            })
+            .catch((error) => {
+                console.error("Logout failed:", error);
+                // Handle logout error, if necessary
+            });
+    };
 
-	let performLogout = () => {
-		resetMetadata();
-		logout().then(() => {
-			navigate("/login");
-		});
-	}
-
-	return (
-		<Button sx={sx}
-				variant="contained"
-				color="secondary"
-				onClick={() => performLogout()}>
-			LOGOUT
-		</Button>
-	);
-};
-
-const mapStateToProps = (state) => {
-	return {
-		sortBy: state.metadata.selectedSortBy,
-		category: state.metadata.selectedCategory,
-	};
+    return (
+        <Button
+            sx={sx}
+            variant="contained"
+            color="secondary"
+            onClick={performLogout}
+        >
+            LOGOUT
+        </Button>
+    );
 };
 
 const mapDispatchToProps = (dispatch) => {
-	return {
-		resetMetadata: () => dispatch(clearAllMetadata()),
-	};
+    return {
+        resetMetadata: () => dispatch(clearAllMetadata()),
+    };
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(Logout);
+export default connect(null, mapDispatchToProps)(Logout);

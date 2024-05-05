@@ -9,29 +9,33 @@ import ProductSorting from "../productSorting/productSorting";
 import ProductListing from "../productListing/productListing";
 
 const Home = () => {
-	const {AuthCtx} = useAuthentication();
-	const {hasRole} = useContext(AuthCtx);
-	let mode = (hasRole(["ADMIN"])) ? "EDIT" : "VIEW";
+    const { AuthCtx } = useAuthentication();
+    const { hasRole } = useContext(AuthCtx);
+    const currentMode = hasRole(['ADMIN']) ? 'EDIT' : 'VIEW';
 
-	return (
-		<Box sx={{flexGrow: 1}}>
-			<Grid container spacing={1}>
-				<Grid container item spacing={3}>
-					<Grid item xs={12}>
-						<div style={{display: 'flex', justifyContent: 'center'}}>
-							<ProductCategory />
-						</div>
-					</Grid>
-					<Grid item xs={12}>
-						<div style={{display: 'flex', justifyContent: 'left', paddingLeft: "1%"}}>
-							<ProductSorting />
-						</div>
-					</Grid>
-					<ProductListing mode={mode}/>
-				</Grid>
-			</Grid>
-		</Box>
-	);
+   
+    const jsxStructure = (
+        <Box sx={{ flexGrow: 1 }}>
+            <Grid container spacing={1}>
+                <Grid container item spacing={3}>
+                    <Grid item xs={12}>
+                        <div style={{ display: 'flex', justifyContent: 'center' }}>
+                            <ProductCategory />
+                        </div>
+                    </Grid>
+                    <Grid item xs={12}>
+                        <div style={{ display: 'flex', justifyContent: 'left', paddingLeft: '1%' }}>
+                            <ProductSorting />
+                        </div>
+                    </Grid>
+                    <ProductListing mode={currentMode} />
+                </Grid>
+            </Grid>
+        </Box>
+    );
+
+    
+    return jsxStructure;
 };
 
 export default Home;

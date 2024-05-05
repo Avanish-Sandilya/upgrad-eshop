@@ -1,197 +1,104 @@
-//Rest APIs for product
+export const fetchAllProducts = async (accessToken) => {
+    try {
+        const response = await fetch('http://localhost:8080/api/products', {
+            method: 'GET',
+            headers: {
+                'x-auth-token': accessToken,
+            },
+        });
 
-export const fetchAllProducts = (accessToken) => {
-	//Note: we are returning promise so that we can resolve it by using appropriate data type like json or text
-	//caller of the function should only be concerned with returned data on success or failure message
-	let promiseResolveRef = null;
-	let promiseRejectRef = null;
-	let promise = new Promise((resolve, reject) => {
-		promiseResolveRef = resolve;
-		promiseRejectRef = reject;
-	});
-	fetch('http://localhost:8080/api/products', {
-		method: 'GET',
-		headers: {
-			'x-auth-token': accessToken,
-		},
-	}).then((response) => {
-		response.json().then((json) => {
-			if(response.ok) {
-				promiseResolveRef({
-					data: json,
-					response: response,
-				});
-			} else {
-				promiseRejectRef({
-					reason: "Server error occurred.",
-					response: response,
-				});
-			}
-		});
-	}).catch((err) => {
-		promiseRejectRef({
-			reason: "Some error occurred.",
-			response: err,
-		});
-	});
-	return promise;
+        if (response.ok) {
+            const data = await response.json();
+            return { data, response };
+        } else {
+            throw new Error("Server error occurred.");
+        }
+    } catch (error) {
+        throw new Error("Some error occurred.");
+    }
 };
 
-export const createProduct = (requestJson, accessToken) => {
-	//Note: we are returning promise so that we can resolve it by using appropriate data type like json or text
-	//caller of the function should only be concerned with returned data on success or failure message
-	let promiseResolveRef = null;
-	let promiseRejectRef = null;
-	let promise = new Promise((resolve, reject) => {
-		promiseResolveRef = resolve;
-		promiseRejectRef = reject;
-	});
-	fetch('http://localhost:8080/api/products', {
-		method: 'POST',
-		body: JSON.stringify(requestJson),
-		headers: {
-			'Content-type': 'application/json; charset=UTF-8',
-			'x-auth-token': accessToken,
-		},
-	}).then((response) => {
-		response.text().then((json) => {
-			if(response.ok) {
-				promiseResolveRef({
-					message: "Product " + requestJson.name + " added successfully.",
-					response: response,
-				});
-			} else {
-				let message = json.message;
-				if(message === undefined || message === null) {
-					message = "Server error occurred. Please try again.";
-				}
-				promiseRejectRef({
-					reason: message,
-					response: response,
-				});
-			}
-		});
-	}).catch((err) => {
-		promiseRejectRef({
-			reason: "Some error occurred. Please try again.",
-			response: err,
-		});
-	});
-	return promise;
+export const createProduct = async (requestJson, accessToken) => {
+    try {
+        const response = await fetch('http://localhost:8080/api/products', {
+            method: 'POST',
+            body: JSON.stringify(requestJson),
+            headers: {
+                'Content-type': 'application/json; charset=UTF-8',
+                'x-auth-token': accessToken,
+            },
+        });
+
+        if (response.ok) {
+            return { message: `Product ${requestJson.name} added successfully.`, response };
+        } else {
+            const json = await response.json();
+            const message = json.message || "Server error occurred. Please try again.";
+            throw new Error(message);
+        }
+    } catch (error) {
+        throw new Error("Some error occurred. Please try again.");
+    }
 };
 
-export const deleteProduct = (id, accessToken) => {
-	//Note: we are returning promise so that we can resolve it by using appropriate data type like json or text
-	//caller of the function should only be concerned with returned data on success or failure message
-	let promiseResolveRef = null;
-	let promiseRejectRef = null;
-	let promise = new Promise((resolve, reject) => {
-		promiseResolveRef = resolve;
-		promiseRejectRef = reject;
-	});
-	fetch('http://localhost:8080/api/products/'+id, {
-		method: 'DELETE',
-		headers: {
-			'x-auth-token': accessToken,
-		},
-	}).then((response) => {
-		response.text().then(() => {
-			if(response.ok) {
-				promiseResolveRef({
-					response: response,
-				});
-			} else {
-				promiseRejectRef({
-					reason: "Server error occurred.",
-					response: response,
-				});
-			}
-		});
-	}).catch((err) => {
-		promiseRejectRef({
-			reason: "Some error occurred.",
-			response: err,
-		});
-	});
-	return promise;
+export const deleteProduct = async (id, accessToken) => {
+    try {
+        const response = await fetch(`http://localhost:8080/api/products/${id}`, {
+            method: 'DELETE',
+            headers: {
+                'x-auth-token': accessToken,
+            },
+        });
+
+        if (response.ok) {
+            return { response };
+        } else {
+            throw new Error("Server error occurred.");
+        }
+    } catch (error) {
+        throw new Error("Some error occurred.");
+    }
 };
 
-export const modifyProduct = (requestJson, accessToken) => {
-	//Note: we are returning promise so that we can resolve it by using appropriate data type like json or text
-	//caller of the function should only be concerned with returned data on success or failure message
-	let promiseResolveRef = null;
-	let promiseRejectRef = null;
-	let promise = new Promise((resolve, reject) => {
-		promiseResolveRef = resolve;
-		promiseRejectRef = reject;
-	});
-	fetch('http://localhost:8080/api/products/' + requestJson.id, {
-		method: 'PUT',
-		body: JSON.stringify(requestJson),
-		headers: {
-			'Content-type': 'application/json; charset=UTF-8',
-			'x-auth-token': accessToken,
-		},
-	}).then((response) => {
-		response.text().then((json) => {
-			if(response.ok) {
-				promiseResolveRef({
-					message: "Product " + requestJson.name + " modified successfully.",
-					response: response,
-				});
-			} else {
-				let message = json.message;
-				if(message === undefined || message === null) {
-					message = "Server error occurred. Please try again.";
-				}
-				promiseRejectRef({
-					reason: message,
-					response: response,
-				});
-			}
-		});
-	}).catch((err) => {
-		promiseRejectRef({
-			reason: "Some error occurred. Please try again.",
-			response: err,
-		});
-	});
-	return promise;
+export const modifyProduct = async (requestJson, accessToken) => {
+    try {
+        const response = await fetch(`http://localhost:8080/api/products/${requestJson.id}`, {
+            method: 'PUT',
+            body: JSON.stringify(requestJson),
+            headers: {
+                'Content-type': 'application/json; charset=UTF-8',
+                'x-auth-token': accessToken,
+            },
+        });
+
+        if (response.ok) {
+            return { message: `Product ${requestJson.name} modified successfully.`, response };
+        } else {
+            const json = await response.json();
+            const message = json.message || "Server error occurred. Please try again.";
+            throw new Error(message);
+        }
+    } catch (error) {
+        throw new Error("Some error occurred. Please try again.");
+    }
 };
 
-export const viewProduct = (id, accessToken) => {
-	//Note: we are returning promise so that we can resolve it by using appropriate data type like json or text
-	//caller of the function should only be concerned with returned data on success or failure message
-	let promiseResolveRef = null;
-	let promiseRejectRef = null;
-	let promise = new Promise((resolve, reject) => {
-		promiseResolveRef = resolve;
-		promiseRejectRef = reject;
-	});
-	fetch('http://localhost:8080/api/products/'+id, {
-		method: 'GET',
-		headers: {
-			'x-auth-token': accessToken,
-		},
-	}).then((response) => {
-		response.json().then((json) => {
-			if(response.ok) {
-				promiseResolveRef({
-					value: json,
-					response: response,
-				});
-			} else {
-				promiseRejectRef({
-					reason: "Server error occurred.",
-					response: response,
-				});
-			}
-		});
-	}).catch((err) => {
-		promiseRejectRef({
-			reason: "Some error occurred.",
-			response: err,
-		});
-	});
-	return promise;
+export const viewProduct = async (id, accessToken) => {
+    try {
+        const response = await fetch(`http://localhost:8080/api/products/${id}`, {
+            method: 'GET',
+            headers: {
+                'x-auth-token': accessToken,
+            },
+        });
+
+        if (response.ok) {
+            const value = await response.json();
+            return { value, response };
+        } else {
+            throw new Error("Server error occurred.");
+        }
+    } catch (error) {
+        throw new Error("Some error occurred.");
+    }
 };
